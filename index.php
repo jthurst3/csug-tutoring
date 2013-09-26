@@ -1,6 +1,6 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors',1);
+// error_reporting(E_ALL);
+// ini_set('display_errors',1);
 
 // authorized API access for a dummy project that can only be requested from [anon.]csug.rochester.edu (128.151.69.98)
 $uct_callink_key = 'AIzaSyB6xPrZcyxXHdWvXrx3GUWeEGczw42YdLQ';
@@ -27,7 +27,6 @@ $api_events_list_query =
 function curl_get($url, $query_object = array()) {
     $url .= http_build_query($query_object);
     $url = str_replace('%3A', ':', $url);
-    $url = str_replace('%25', '', $url);
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -36,13 +35,16 @@ function curl_get($url, $query_object = array()) {
 }
 
 $now = time();
+$week_start = strtotime('last sunday', $now);
+$week_end = strtotime('next sunday', $now);
+$week_name = date('M jS', $week_start).' through '.date('M jS', $week_end-1);
 if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 900) {
     $tutoring_list = file_get_contents('tutors-cache.txt');
 } else {
     $tutoring_list = '';
 
-    $api_events_list_query['timeMin'] = date('%c', strtotime('last sunday'));
-    $api_events_list_query['timeMax'] = date('%c', strtotime('next sunday'));
+    $api_events_list_query['timeMin'] = date('c', $week_start);
+    $api_events_list_query['timeMax'] = date('c', $week_end);
     $events_this_week = curl_get($api_base.$api_events_list, $api_events_list_query);
     if (isset($events_this_week['items'])) {
         $tutoring_list = '<table cellpadding="10">';
@@ -144,8 +146,8 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 90
         <div class="container">
             <div class="hero-unit">
                 <h1>Need CS help?</h1>
-                <p>You're in the right place. CSUG offers free tutoring for all CS courses.</p>
-                <p>Tutoring sessions this week:</p>
+                <p>You're in the right place. CSUG offers <b>free tutoring</b> for all CS courses.</p>
+                <p>Tutoring sessions this week (for <?php echo $week_name; ?>):</p>
                 <?php echo $tutoring_list; ?>
                 <p><a class="btn btn-primary btn-large" href="https://www.google.com/calendar/embed?src=04lnqg1jsbtupnkq09esf5ccpo%40group.calendar.google.com&amp;ctz=America/New_York" onClick="_gaq.push(['_trackEvent', 'Followup', 'Schedule']);">See full schedule &raquo;</a></p>
             </div>
@@ -157,7 +159,7 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 90
                 </div>
                 <div class="span6">
                     <h2>What we do</h2>
-                    <p>We provide tutoring Monday through Fridays during the school year.  If you're having difficulty with homework, you're stuck on a project, or you need a second pair of eyes, please stop by.</p>
+                    <p>We provide tutoring <b>Monday through Fridays</b> during the school year.  If you're having difficulty with homework, you're stuck on a project, or you need a second pair of eyes, please stop by.  This year we are also willing to help you set up your programming environment.</p>
                 </div>
             </div>
             <hr>
@@ -168,7 +170,7 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 90
                 </div>
                 <div class="span6">
                     <h2>Contact us</h2>
-                <p>Can't find the room?  Do you have a comment or suggestion? Unable to attend any of the times? Want to become a tutor?</p>
+                <p>Can't find the room?  Do you have a comment or suggestion?  Unable to attend any of the times?  Want to become a tutor?</p>
                     <p><a class="btn" href="mailto:csug-tutoring@googlegroups.com">Send us an email &raquo;</a></p>
                 </div>
             </div>
@@ -193,13 +195,13 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 90
         <script src="assets/js/bootstrap-carousel.js"></script>
         <script src="assets/js/bootstrap-typeahead.js"></script-->
 
-        <!--script type="text/javascript">
+        <script type="text/javascript">
             (function() {
              var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
              ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
              var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
              })();
-        </script-->
+        </script>
      </body>
  </html>
 
