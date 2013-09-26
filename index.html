@@ -28,6 +28,19 @@
             _gaq.push(['_trackPageview']);
         </script>
 
+        <script type="text/javascript">
+            // adapted from http://stackoverflow.com/a/819455/835995
+            function doFit(element) {
+                var newheight = null;
+                if (element) {
+                    newheight = (element.contentWindow.document.body.clientHeight ||
+                                element.contentWindow.document.body.scrollHeight) || null;
+                }
+                if (newheight) {
+                    element.height = (newheight) + "px";
+                }
+            }
+        </script>
     </head>
 
     <body>
@@ -39,12 +52,12 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </a>
-                    <a class="brand" href="index.html#">Rochester CSUG Tutoring</a>
-                    <div class="nav-collapse collapse">
+                    <a class="brand" href="index.html#">University of Rochester CSUG Tutoring</a>
+                    <!-- unnecessary self-link <div class="nav-collapse collapse">
                         <ul class="nav">
                             <li class="active"><a href="index.html#">Home</a></li>
                         </ul>
-                    </div><!--/.nav-collapse -->
+                    </div>--><!--/.nav-collapse -->
                 </div>
             </div>
         </div>
@@ -53,7 +66,9 @@
             <div class="hero-unit">
                 <h1>Need CS help?</h1>
                 <p>You're in the right place. CSUG offers free tutoring for all CS courses.</p>
-                <p><a class="btn btn-primary btn-large" href="https://www.google.com/calendar/embed?src=04lnqg1jsbtupnkq09esf5ccpo%40group.calendar.google.com&amp;ctz=America/New_York" onClick="_gaq.push(['_trackEvent', 'Followup', 'Schedule']);">See our schedule &raquo;</a></p>
+                <p>Tutoring sessions this week:</p>
+                <iframe id="embedded_app" seamless style="border: none; width: 100%;" src="embed_app.php?id=AKfycbxDMw9UXi4kLlySwtrcxzaDjYSoWWKrDW6reCVrusSrpAJn3lU" margin="0" padding="0" onload="doFit(this);"></iframe>
+                <p><a class="btn btn-primary btn-large" href="https://www.google.com/calendar/embed?src=04lnqg1jsbtupnkq09esf5ccpo%40group.calendar.google.com&amp;ctz=America/New_York" onClick="_gaq.push(['_trackEvent', 'Followup', 'Schedule']);">See full schedule &raquo;</a></p>
             </div>
 
             <div class="row">
@@ -74,7 +89,7 @@
                 </div>
                 <div class="span6">
                     <h2>Contact us</h2>
-                    <p>Can't find the room?  Do you have a comment or suggestion? Unable to attend any of the times? Want to become a tutor?</p>
+                <p>Can't find the room?  Do you have a comment or suggestion? Unable to attend any of the times? Want to become a tutor?</p>
                     <p><a class="btn" href="mailto:csug-tutoring@googlegroups.com">Send us an email &raquo;</a></p>
                 </div>
             </div>
@@ -105,7 +120,7 @@
              ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
              var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
              })();
-         </script>
-
+        </script>
      </body>
  </html>
+
