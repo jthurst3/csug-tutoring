@@ -1,3 +1,83 @@
+<?php
+error_reporting(E_ALL);
+ini_set('display_errors',1);
+
+// authorized API access for a dummy project that can only be requested from [anon.]csug.rochester.edu (128.151.69.98)
+$uct_callink_key = 'AIzaSyB6xPrZcyxXHdWvXrx3GUWeEGczw42YdLQ';
+// calendar to read
+$uct_cal_id = '04lnqg1jsbtupnkq09esf5ccpo@group.calendar.google.com';
+// APC cached variable
+$uct_apc = 'ur-csug-tutoring:callink';
+
+// API request constructions
+// base URL
+$api_base = 'https://www.googleapis.com/calendar/v3/';
+// request for events in a week
+$api_events_list = "calendars/$uct_cal_id/events?";
+// request for events in a week: GET params
+$api_events_list_query =
+    array(
+        'key'=>$uct_callink_key,
+        'maxResults'=>50,
+        'singleEvents'=>'true',
+        'orderBy'=>'startTime',
+        //set 'timeMin' and 'timeMax'
+    );
+
+function curl_get($url, $query_object = array()) {
+    $url .= http_build_query($query_object);
+    $url = str_replace('%3A', ':', $url);
+    $url = str_replace('%25', '', $url);
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $json = curl_exec($ch);
+    return json_decode($json, true);
+}
+
+$now = time();
+if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 900) {
+    $tutoring_list = file_get_contents('tutors-cache.txt');
+} else {
+    $tutoring_list = '';
+
+    $api_events_list_query['timeMin'] = date('%c', strtotime('last sunday'));
+    $api_events_list_query['timeMax'] = date('%c', strtotime('next sunday'));
+    $events_this_week = curl_get($api_base.$api_events_list, $api_events_list_query);
+    if (isset($events_this_week['items'])) {
+        $tutoring_list = '<table cellpadding="10">';
+        foreach ($events_this_week['items'] as $event) {
+            $tutor = $event['summary'];
+            $start = strtotime($event['start']['dateTime']);
+            $end = strtotime($event['end']['dateTime']);
+            $location = $event['location'];
+            $bg_color = 'transparent';
+            $fg_color = 'black';
+            $fg_ital = 'normal';
+            if ($now > $end) {
+                $style_as = 'past';
+                $fg_color = '#c0c0c0';
+                $fg_ital = 'italic';
+            } else if ($now > $start) {
+                $style_as = 'now';
+                $bg_color=  '#ffff00';
+            } else if ($now > strtotime('today', $start)) {
+                $style_as = 'today';
+                $bg_color = '#ffffc0';
+            } else {
+                $style_as = 'future';
+            }
+            $tutoring_list .= "<tr style=\"color:$fg_color;background-color:$bg_color;font-style:$fg_ital;\"><td>".date('l', $start).' at '.date('g:i A', $start).' - '.date('g:i A', $end)." in $location ($style_as)</td><td style=\"font-weight:bold;\">$tutor</tr>";
+        }
+        $tutoring_list .= '</table>';
+    } else {
+        $tutoring_list = '<pre>Error getting tutor list:'."\n".var_dump($events_this_week).'</pre>';
+    }
+
+    file_put_contents('tutors-cache.txt', $tutoring_list);
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -27,7 +107,6 @@
             _gaq.push(['_setAccount', 'UA-34732780-1']);
             _gaq.push(['_trackPageview']);
         </script>
-
         <script type="text/javascript">
             // adapted from http://stackoverflow.com/a/819455/835995
             function doFit(element) {
@@ -67,7 +146,7 @@
                 <h1>Need CS help?</h1>
                 <p>You're in the right place. CSUG offers free tutoring for all CS courses.</p>
                 <p>Tutoring sessions this week:</p>
-                <iframe id="embedded_app" seamless style="border: none; width: 100%;" src="embed_app.php?id=AKfycbxDMw9UXi4kLlySwtrcxzaDjYSoWWKrDW6reCVrusSrpAJn3lU" margin="0" padding="0" onload="doFit(this);"></iframe>
+                <?php echo $tutoring_list; ?>
                 <p><a class="btn btn-primary btn-large" href="https://www.google.com/calendar/embed?src=04lnqg1jsbtupnkq09esf5ccpo%40group.calendar.google.com&amp;ctz=America/New_York" onClick="_gaq.push(['_trackEvent', 'Followup', 'Schedule']);">See full schedule &raquo;</a></p>
             </div>
 
@@ -114,13 +193,13 @@
         <script src="assets/js/bootstrap-carousel.js"></script>
         <script src="assets/js/bootstrap-typeahead.js"></script-->
 
-        <script type="text/javascript">
+        <!--script type="text/javascript">
             (function() {
              var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
              ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
              var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
              })();
-        </script>
+        </script-->
      </body>
  </html>
 
