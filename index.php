@@ -26,7 +26,7 @@ $api_events_list_query =
 
 function curl_get($url, $query_object = array()) {
     $url .= http_build_query($query_object);
-    $url = str_replace('%3A', ':', $url);
+    // $url = str_replace('%3A', ':', $url);
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -49,10 +49,10 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 90
     if (isset($events_this_week['items'])) {
         $tutoring_list = '<table cellpadding="10">';
         foreach ($events_this_week['items'] as $event) {
-            $tutor = $event['summary'];
+            $tutor = htmlentities($event['summary']);
             $start = strtotime($event['start']['dateTime']);
             $end = strtotime($event['end']['dateTime']);
-            $location = $event['location'];
+            $location = htmlentities($event['location']);
             $bg_color = 'transparent';
             $fg_color = 'black';
             $fg_ital = 'normal';
