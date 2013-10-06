@@ -105,8 +105,8 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 90
     $tutoring_list = file_get_contents('tutors-cache.txt');
 } else {
     // do actual query
-    $week_start = strtotime('last sunday', $now);
-    $week_end = strtotime('next sunday', $now);
+    $week_start = strtotime('+1 day', strtotime('last Saturday', $now));
+    $week_end = strtotime('next Sunday', $week_start);
     $api_events_list_query['timeMin'] = date('c', $week_start);
     $api_events_list_query['timeMax'] = date('c', $week_end);
     $events_this_week = curl_get_json($api_base.$api_events_list, $api_events_list_query);
@@ -119,8 +119,8 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 90
         // no sessions
         $tutoring_list = "<p>No tutoring sessions are scheduled for this week. This could be because it's a school vacation.</p>";
     } else {
-        $week_start_v = date_adapt(strtotime('tomorrow', $week_start), $now, 2);
-        $week_end_v = date_adapt(strtotime('yesterday', $week_end) - 1, $week_start, 1);
+        $week_start_v = date_adapt(strtotime('+1 day', $week_start), $now, 2);
+        $week_end_v = date_adapt(strtotime('-2 days', $week_end), $week_start, 1);
         $tutoring_list = "<p>Tutoring sessions this week (the week of $week_start_v through $week_end_v):</p>";
 
         // iterate over events
