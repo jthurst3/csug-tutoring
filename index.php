@@ -98,15 +98,10 @@ function date_adapt($value, $now, $minimum_parts) {
     return date($fmt, $value);
 }
 
+function display_week($week_relative_name, $week_start, $week_end) {
+    global $api_base, $api_events_list, $api_events_list_query;
+    global $now, $tutoring_list;
 
-// calculations for list display
-$now = time();
-if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 900) {
-    $tutoring_list = file_get_contents('tutors-cache.txt');
-} else {
-    // do actual query
-    $week_start = strtotime('+1 day', strtotime('last Saturday', $now));
-    $week_end = strtotime('next Sunday', $week_start);
     $api_events_list_query['timeMin'] = date('c', $week_start);
     $api_events_list_query['timeMax'] = date('c', $week_end);
     $events_this_week = curl_get_json($api_base.$api_events_list, $api_events_list_query);
@@ -114,14 +109,14 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 90
     // check whether we had a result and print first line
     if ($events_this_week === false || !isset($events_this_week['items'])) {
         // $events_this_week did not have an 'items' element
-        $tutoring_list = '<pre>Error getting tutor list. Value of $events_this_week:'."\n".var_dump($events_this_week).'</pre>';
+        $tutoring_list .= "<pre>Error getting tutor list for $week_relative_name week. Value of $events_this_week:\n".var_dump($events_this_week).'</pre>';
     } elseif (count($events_this_week['items']) == 0) {
         // no sessions
-        $tutoring_list = "<p>No tutoring sessions are scheduled for this week. This could be because it's a school vacation.</p>";
+        $tutoring_list .= "<p>No tutoring sessions are scheduled for $week_relative_name week. This could be because it's a school vacation.</p>";
     } else {
         $week_start_v = date_adapt(strtotime('+1 day', $week_start), $now, 2);
         $week_end_v = date_adapt(strtotime('-2 days', $week_end), $week_start, 1);
-        $tutoring_list = "<p>Tutoring sessions this week (the week of $week_start_v through $week_end_v):</p>";
+        $tutoring_list .= "<p>Tutoring sessions $week_relative_name week (the week of $week_start_v through $week_end_v):</p>";
 
         // iterate over events
         $tutoring_list .= '<table cellpadding="8">';
@@ -152,6 +147,21 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 90
         }
         $tutoring_list .= '</table>';
     }
+}
+
+
+// calculations for list display
+$now = time();
+if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 900) {
+    $tutoring_list = file_get_contents('tutors-cache.txt');
+} else {
+    // do actual query
+    $week_start = strtotime('+1 day', strtotime('last Saturday', $now));
+    $week_end = strtotime('next Sunday', $week_start);
+    display_week('this', $week_start, $week_end);
+    $week_start = strtotime('+7 days', $week_start);
+    $week_end = strtotime('+7 days', $week_end);
+    display_week('next', $week_start, $week_end);
 
     file_put_contents('tutors-cache.txt', $tutoring_list);
 }
