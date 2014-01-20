@@ -112,7 +112,7 @@ function display_week($week_relative_name, $week_start, $week_end) {
         $tutoring_list .= "<pre>Error getting tutor list for $week_relative_name week. Value of $events_this_week:\n".var_dump($events_this_week).'</pre>';
     } elseif (count($events_this_week['items']) == 0) {
         // no sessions
-        $tutoring_list .= "<p>No tutoring sessions are scheduled for $week_relative_name week. This could be because it's a school vacation.</p>";
+        $tutoring_list .= '';//"<p>No tutoring sessions are scheduled for $week_relative_name week. This could be because it's a school vacation.</p>";
     } else {
         $week_start_v = date_adapt(strtotime('+1 day', $week_start), $now, 2);
         $week_end_v = date_adapt(strtotime('-2 days', $week_end), $week_start, 1);
@@ -170,18 +170,18 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 90
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="utf-8">
         <title>Rochester CSUG Tutoring</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
         <!-- styles -->
         <link href="assets/css/bootstrap.css" rel="stylesheet">
         <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
         <style type="text/css">
-            body {
+            /*body {
                 padding-top: 60px;
                 padding-bottom: 40px;
-            }
+            }*/
             tr.today { background-color: #ffffc0; }
             tr.now { background-color: #ffff00; }
             tr.past { color: #c0c0c0; font-style: italic; }
@@ -203,7 +203,7 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 90
     </head>
 
     <body>
-        <div class="navbar navbar-inverse navbar-fixed-top">
+        <!--<div class="navbar navbar-inverse navbar-fixed-top">
             <div class="navbar-inner">
                 <div class="container">
                     <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -212,19 +212,20 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 90
                         <span class="icon-bar"></span>
                     </a>
                     <a class="brand" href="index.html#">University of Rochester CSUG Tutoring</a>
-                    <!-- unnecessary self-link <div class="nav-collapse collapse">
+                    <div class="nav-collapse collapse">
                         <ul class="nav">
                             <li class="active"><a href="index.html#">Home</a></li>
                         </ul>
-                    </div>--><!--/.nav-collapse -->
+                    </div>
                 </div>
             </div>
-        </div>
-
+        </div>-->
         <div class="container">
+            <a style="margin-bottom:10px;display:block" href="http://cs.rochester.edu/"><img id="logo" src="../urcs-banner.png" alt="Department of Computer Science, part of the Hajim School of Engineering at the University of Rochester" /></a>
+
             <div class="hero-unit">
                 <h1>Need CS help?</h1>
-                <p>You're in the right place. <img src="csug-b-256-t.png" width="32" height="32" alt="CSUG (logo)" title="Computer Science Undergraduate Council" style="cursor:help" /> offers <b>free tutoring</b> for all CS courses.</p>
+                <p>You're in the right place. <img src="csug-b-256-t.png" width="32" height="32" alt="CSUG (logo)" title="Computer Science Undergraduate Council" style="cursor:help" /> offers <b>free tutoring</b> for all <b>Computer Science</b> courses.</p>
                 <?php echo $tutoring_list; ?>
                 <p><a class="btn btn-primary btn-large" href="https://www.google.com/calendar/embed?src=04lnqg1jsbtupnkq09esf5ccpo%40group.calendar.google.com&amp;ctz=America/New_York" onClick="_gaq.push(['_trackEvent', 'Followup', 'Schedule']);">See full schedule &raquo;</a></p>
             </div>
