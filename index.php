@@ -25,6 +25,7 @@ $api_events_list_query =
 
 // csug-tutoring defaults
 $def_location = 'Hylan 301';
+$def_class_list = 'CSC 171, 172';
 
 // not PHP 5.5.0 yet!
 if (!function_exists('json_last_error_msg')) {
@@ -98,39 +99,44 @@ function date_adapt($value, $now, $minimum_parts) {
     return date($fmt, $value);
 }
 
-function display_week($week_relative_name, $week_start, $week_end) {
+function display_week($week_relative_name, $week_start, $week_end, $range_start, $range_end) {
     global $api_base, $api_events_list, $api_events_list_query;
-    global $now, $tutoring_list;
+    global $now;
 
-    $api_events_list_query['timeMin'] = date('c', $week_start);
-    $api_events_list_query['timeMax'] = date('c', $week_end);
+    $tutoring_list = '';
+
+    $api_events_list_query['timeMin'] = date('c', $range_start);
+    $api_events_list_query['timeMax'] = date('c', $range_end);
     $events_this_week = curl_get_json($api_base.$api_events_list, $api_events_list_query);
 
     // check whether we had a result and print first line
     if ($events_this_week === false || !isset($events_this_week['items'])) {
         // $events_this_week did not have an 'items' element
-        $tutoring_list .= "<pre>Error getting tutor list for $week_relative_name week. Value of $events_this_week:\n".var_dump($events_this_week).'</pre>';
+        $tutoring_list .= "<tr><td colspan=\"2\"><pre>Error getting tutor list for $week_relative_name week. Value of $events_this_week:\n".var_dump($events_this_week).'</pre></td></tr>';
     } elseif (count($events_this_week['items']) == 0) {
         // no sessions
-        $tutoring_list .= '';//"<p>No tutoring sessions are scheduled for $week_relative_name week. This could be because it's a school vacation.</p>";
-    } else {
+        $tutoring_list .= ($week_relative_name == 'this') ? "<tr><td colspan=\"2\">No tutoring sessions are scheduled for $week_relative_name week. This could be because it's a school vacation.</td></tr>" : '';
+    } else  {
         $week_start_v = date_adapt(strtotime('+1 day', $week_start), $now, 2);
         $week_end_v = date_adapt(strtotime('-2 days', $week_end), $week_start, 1);
-        $tutoring_list .= "<p>Tutoring sessions $week_relative_name week (the week of $week_start_v through $week_end_v):</p>";
+        $tutoring_list .= "<tr><td colspan=\"2\">Tutoring sessions $week_relative_name week (the week of $week_start_v through $week_end_v):</td></tr>";
 
         // iterate over events
-        $tutoring_list .= '<table cellpadding="8">';
         foreach ($events_this_week['items'] as $event) {
             $tutor = isset($event['summary']) ? htmlentities($event['summary']) : 'Tutor Name';
             $start = isset($event['start']['dateTime']) ? strtotime($event['start']['dateTime']) : -1;
             $end = isset($event['end']['dateTime']) ? strtotime($event['end']['dateTime']) : -1;
             $location = isset($event['location']) ? htmlentities($event['location']) : $def_location;
+            $class_list = isset($event['description']) ? htmlentities($event['description']) : $def_class_list;
             if (!strlen($location)) {
                 $location = $def_location;
             }
+            if (!strlen($class_list)) {
+                $class_list = $def_class_list;
+            }
 
             if ($start <= 0 || $end <= 0) {
-                $tutoring_list .= '<tr><td><pre>Error parsing one of the returned events. Value of $event:'."\n".var_dump($event).'</pre></td></tr>';
+                $tutoring_list .= '<tr><td colspan="2"><pre>Error parsing one of the returned events. Value of $event:'."\n".var_dump($event).'</pre></td></tr>';
                 continue;
             }
 
@@ -143,10 +149,15 @@ function display_week($week_relative_name, $week_start, $week_end) {
             } else {
                 $row_style = 'future';
             }
-            $tutoring_list .= "<tr class=\"$row_style\"><td><span title=\"".date_adapt($start, $now, 1)."\">".date('l', $start).'</span> at '.date('g:i A', $start).' - '.date('g:i A', $end)." in $location ($row_style)</td><td class=\"tutor\">$tutor</tr>";
+            $tutoring_list .= '<tr class="'.$row_style.'">'.
+                '<td class="tutor">'.$tutor.'</td><td>'.
+                date('l', $start).' '.date_adapt($start, $now, 1).' at '.
+                date('g:i A', $start).' - '.date('g:i A', $end)." ($row_style) in $location<br/>".
+                '<span class="class_list">'.$class_list.'</span></td></tr>';
+            //$tutoring_list .= "<tr class="
         }
-        $tutoring_list .= '</table>';
     }
+    return $tutoring_list;
 }
 
 
@@ -156,12 +167,16 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 90
     $tutoring_list = file_get_contents('tutors-cache.txt');
 } else {
     // do actual query
-    $week_start = strtotime('+1 day', strtotime('last Saturday', $now));
-    $week_end = strtotime('next Sunday', $week_start);
-    display_week('this', $week_start, $week_end);
-    $week_start = strtotime('+7 days', $week_start);
-    $week_end = strtotime('+7 days', $week_end);
-    display_week('next', $week_start, $week_end);
+    $week1_start = strtotime('+1 day', strtotime('last Saturday', $now));
+    $week1_end = strtotime('next Sunday', $week1_start);
+    $first_day = strtotime('today', $now);
+    $last_day = strtotime('+8 days', $first_day);
+    $week2_start = strtotime('+7 days', $week1_start);
+    $week2_end = strtotime('+7 days', $week1_end);
+    $tutoring_list  = '<table>';
+    $tutoring_list .= display_week('this', $week1_start, $week1_end, $first_day, $week1_end);
+    $tutoring_list .= display_week('next', $week2_start, $week2_end, $week2_start, $last_day);
+    $tutoring_list .= '</table>';
 
     file_put_contents('tutors-cache.txt', $tutoring_list);
 }
@@ -182,10 +197,13 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 90
                 padding-top: 60px;
                 padding-bottom: 40px;
             }*/
-            tr.today { background-color: #ffffc0; }
-            tr.now { background-color: #ffff00; }
-            tr.past { color: #c0c0c0; font-style: italic; }
-            td.tutor { font-weight: bold; }
+            table { padding: 0; border-spacing: 5px; border-collapse: separate; }
+            tr.today { background-color: #ffd; }
+            tr.now { background-color: #ff8; font-weight: bold; }
+            tr.past { color: #bbb; font-style: italic; }
+            span.class_list { color: #777; }
+            tr.past span.class_list { color: #ccc; }
+            td.tutor { font-weight: bold; vertical-align: top; }
         </style>
 
         <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
