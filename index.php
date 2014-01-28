@@ -163,7 +163,7 @@ function display_week($week_relative_name, $week_start, $week_end, $range_start,
 
 // calculations for list display
 $now = time();
-if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 900) {
+if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 60) {
     $tutoring_list = file_get_contents('tutors-cache.txt');
 } else {
     // do actual query
