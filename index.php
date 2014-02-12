@@ -127,7 +127,7 @@ function display_week($week_relative_name, $week_start, $week_end, $range_start,
             $start = isset($event['start']['dateTime']) ? strtotime($event['start']['dateTime']) : -1;
             $end = isset($event['end']['dateTime']) ? strtotime($event['end']['dateTime']) : -1;
             $location = isset($event['location']) ? htmlentities($event['location']) : $def_location;
-            $class_list = isset($event['description']) ? htmlentities($event['description']) : $def_class_list;
+            $class_list = isset($event['description']) ? str_replace("\n", '<br/>', htmlentities($event['description'])) : $def_class_list;
             if (!strlen($location)) {
                 $location = $def_location;
             }
@@ -152,7 +152,7 @@ function display_week($week_relative_name, $week_start, $week_end, $range_start,
             $tutoring_list .= '<tr class="'.$row_style.'">'.
                 '<td class="tutor">'.$tutor.'</td><td>'.
                 date('l', $start).' '.date_adapt($start, $now, 1).' at '.
-                date('g:i A', $start).' - '.date('g:i A', $end)." ($row_style) in $location<br/>".
+                date('g:ia', $start).' - '.date('g:ia', $end)." ($row_style) in $location<br/>".
                 '<span class="class_list">'.$class_list.'</span></td></tr>';
             //$tutoring_list .= "<tr class="
         }
@@ -170,7 +170,7 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 60
     $week1_start = strtotime('+1 day', strtotime('last Saturday', $now));
     $week1_end = strtotime('next Sunday', $week1_start);
     $first_day = strtotime('today', $now);
-    $last_day = strtotime('+8 days', $first_day);
+    $last_day = strtotime('+7 days', $first_day);
     $week2_start = strtotime('+7 days', $week1_start);
     $week2_end = strtotime('+7 days', $week1_end);
     $tutoring_list  = '<table>';
