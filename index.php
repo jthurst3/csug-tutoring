@@ -239,7 +239,7 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 60
             </div>
         </div>-->
         <div class="container">
-            <a style="margin-bottom:10px;display:block" href="http://cs.rochester.edu/"><img id="logo" src="../urcs-banner-old.png" alt="Department of Computer Science, part of the Hajim School of Engineering at the University of Rochester" /></a>
+            <a style="margin-bottom:10px;display:block" href="http://cs.rochester.edu/"><img id="logo" src="urcs-banner-old.png" alt="Department of Computer Science, part of the Hajim School of Engineering at the University of Rochester" /></a>
 
             <div class="hero-unit">
                 <h1>Need CS help?</h1>
