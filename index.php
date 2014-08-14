@@ -239,16 +239,7 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 60
             </div>
         </div>-->
         <div class="container">
-            <!-- HEADER GOES HERE -->
-            <!-- <div id="hajim_header" style="background-image:url(http://www.hajim.rochester.edu/assets/images/templates/header-background.png)">
-                <a href="http://www.hajim.rochester.edu">
-                    <img alt="Hajim School of Engineering and Applied Sciences" src="//www.hajim.rochester.edu/assets/images/templates/header-logo.png" style="float:left;" />
-                </a>
-                <a href="index.php">
-                    <img alt="Department of Computer Science" src="//www.hajim.rochester.edu/assets/images/templates/csc-header-title.png" style="float:right" />
-                </a>
-                <br clear="all" />
-            </div> -->
+            <a style="margin-bottom:10px;display:block" href="http://cs.rochester.edu/"><img id="logo" src="urcs-banner-old.png" alt="Department of Computer Science, part of the Hajim School of Engineering at the University of Rochester" /></a>
 
             <div class="hero-unit">
                 <h1>Need CS help?</h1>
