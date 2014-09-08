@@ -179,6 +179,7 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 60
     $tutoring_list .= '</table>';
 
     file_put_contents('tutors-cache.txt', $tutoring_list);
+    $tutoring_list .= '<br>* = Will help you set up your development environment<br><br>';
 }
 
 ?>
@@ -255,14 +256,14 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 60
                 </div>
                 <div class="span6">
                     <h2>What we do</h2>
-                    <p>We provide tutoring <b>Monday through Fridays</b> during the school year.  If you're having difficulty with homework, you're stuck on a project, or you need a second pair of eyes, please stop by.  This year we are also willing to help you set up your programming environment.</p>
+                    <p>We provide tutoring <b>Monday through Fridays</b> during the school year.  If you're having difficulty with homework, you're stuck on a project, or you need a second pair of eyes, please stop by. Some of us are also able to help you set up your development environment!</p>
                 </div>
             </div>
             <hr>
             <div class="row">
                 <div class="span6">
                     <h2>Find us</h2>
-                    <p>You'll usually be able to find one of us in <b>Hylan 301</b> (the non-major's computer science lab) on weekdays in the late morning or afternoon.  See our schedule for more details or changes in our location.</p>
+                    <p>You'll usually be able to find one of us in <b>Hylan 301</b> (the non-major's computer science lab) on weekdays in the late morning or afternoon.  Please see our schedule for more details or changes in our location.</p>
                 </div>
                 <div class="span6">
                     <h2>Contact us</h2>
