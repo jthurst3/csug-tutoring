@@ -263,7 +263,7 @@ if (file_exists('tutors-cache.txt') && $now - filemtime('tutors-cache.txt') < 60
             <div class="row">
                 <div class="span6">
                     <h2>Find us</h2>
-                    <p>You'll usually be able to find one of us in <b>Hylan 301</b> (the non-major's computer science lab) on weekdays in the late morning or afternoon.  Please see our schedule for more details or changes in our location.</p>
+                    <p>You'll usually be able to find one of us in <b>Hylan 301</b> (the non-major's computer science lab) on weekdays between 9AM and 9PM.  Please see our schedule for more details or changes in our location.</p>
                 </div>
                 <div class="span6">
                     <h2>Contact us</h2>
